@@ -1,0 +1,43 @@
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+static unsigned long long faculty(int n){
+    unsigned long long res = 1;
+    for(int i = 2; i <= n; i++){
+        res*=i;
+    }
+    return res;
+}
+static unsigned binom(unsigned long long n, int k){
+    return faculty(n) / (faculty(k) * faculty(n-k));
+}
+static void back(int n, int k, int** res, int*returnSize, int**returnColSizes, int pos, int depth, int* path, int total){
+    //if(*returnSize > total)     return;
+    
+    if(depth == k){
+        res[*returnSize] = malloc(k * sizeof(int));
+        (*returnColSizes)[*returnSize] = depth;
+        memcpy(res[*returnSize], path, depth* sizeof(int));
+        (*returnSize)++;
+        return;
+    }
+
+    if(pos > n)                  return;
+    path[depth] = pos;
+    back(n, k, res, returnSize, returnColSizes, pos+1, depth+1, path, total);
+    back(n, k, res, returnSize, returnColSizes, pos+1, depth, path, total);
+}
+int** combine(int n, int k, int* returnSize, int** returnColumnSizes) {
+    *returnSize = 0;
+    unsigned total = binom(n, k);
+    //printf("%d\n",total);
+    int** res = malloc(total * sizeof(int*));
+    *returnColumnSizes = malloc(total * sizeof(int));
+    int path[k];
+
+    back(n, k, res, returnSize, returnColumnSizes, 1, 0, path, total);
+
+    return res;
+}
