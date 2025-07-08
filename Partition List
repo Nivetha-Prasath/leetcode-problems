@@ -1,0 +1,20 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+struct ListNode* partition(struct ListNode* head, int x) {
+    struct ListNode *head1, *head2;
+    struct ListNode **indir1 = &head1, **indir2 = &head2;
+    struct ListNode ***node;
+    for (; head; head = head->next) {
+        node = (head->val < x) ? &indir1 : &indir2;
+        **node = head;
+        *node = &(**node)->next;
+    }
+    *indir1 = head2;
+    *indir2 = NULL;
+    return head1;
+}
