@@ -1,0 +1,61 @@
+int compare_func(const void *a, const void *b)
+{
+    return (*(int *)a - *(int *)b);
+}
+
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+int** fourSum(int* nums, int numsSize, int target, int* returnSize, int** returnColumnSizes) {
+    
+    int **a = (int **)malloc(sizeof(int *) * numsSize * numsSize);
+    memset(a, 0, sizeof(int *) * numsSize * numsSize);
+
+    *returnColumnSizes = (int *)malloc(sizeof(int) * numsSize * numsSize);
+
+    qsort(nums, numsSize, sizeof(int), compare_func);
+    
+    long long sum, partial_sum;
+    *returnSize = 0;
+    int low, high;
+   
+
+    for (int i = 0; i < numsSize - 3; i++) {
+        if (i > 0 && nums[i] == nums[i - 1])
+            continue;
+        
+        for (int j = i + 1; j < numsSize - 2; j++) {
+            if (j > i + 1 && nums[j] == nums[j - 1])
+                continue;
+            
+            partial_sum = nums[i] + nums[j];
+            low = j + 1;
+            high = numsSize - 1;
+
+            while (low < high) {
+                sum = nums[low] + nums[high];
+                if (sum == target - partial_sum) {
+                    a[(*returnSize)] = (int *)malloc(sizeof(int) * 4);
+                    a[(*returnSize)][0] = nums[i];
+                    a[(*returnSize)][1] = nums[j];
+                    a[(*returnSize)][2] = nums[low];
+                    a[(*returnSize)][3] = nums[high];
+                    (*returnColumnSizes)[(*returnSize)] = 4;
+                    (*returnSize)++;
+                    high --;
+                    while (high > low && nums[high] == nums[high+1])
+                        high--;
+                } else if (sum < target - partial_sum)
+                    low++;
+                else if (sum > target - partial_sum)
+                    high--;
+            }
+        }
+    }
+
+    *returnColumnSizes = (int *)realloc((*returnColumnSizes), sizeof(int) * (*returnSize));
+    a = (int **)realloc(a, sizeof(int *) * (*returnSize));
+    return a;
+}
